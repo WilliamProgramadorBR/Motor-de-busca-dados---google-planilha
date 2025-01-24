@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base target="_top">
+  <style>
+    /* Estilos gerais */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      width: 100vw;
+      box-sizing: border-box;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #4CAF50;
+      font-size: 24px;
+    }
+
+    /* Estilo para o input de busca */
+    input[type="text"] {
+      padding: 10px;
+      font-size: 16px;
+      width: 300px;
+      max-width: 100%;
+      border: 2px solid #ddd;
+      border-radius: 5px;
+      margin-right: 10px;
+      transition: border 0.3s;
+    }
+
+    input[type="text"]:focus {
+      border-color: #4CAF50;
+      outline: none;
+    }
+
+    /* Estilo para os botões */
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      color: #fff;
+      background-color: #4CAF50;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    /* Estilos de loading */
+    #loading {
+      display: none;
+      font-size: 18px;
+      font-weight: bold;
+      color: #4CAF50;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    /* Estilo para os resultados */
+    #resultado {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #fff;
+      border-radius: 8px;
+      border: 2px solid #ddd;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      font-size: 16px;
+      color: #333;
+    }
+
+    #resultado .registro {
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    #resultado .registro:hover {
+      background-color: #f0f0f0;
+    }
+
+    /* Estilos do Modal */
+    #modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    #modal-content {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 600px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    #modal-content p {
+      margin: 10px 0;
+    }
+
+    #modal-close {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #f44336;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    #modal-close:hover {
+      background-color: #e53935;
+    }
+
+    /* Estilo para o botão "Buscar outros alunos" */
+    #refreshButton {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 15px 30px;
+      background-color: #2196F3;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      transition: background-color 0.3s;
+    }
+
+    #refreshButton:hover {
+      background-color: #1976D2;
+    }
+  </style>
+</head>
+<style>
+  /* Estilos gerais */
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    box-sizing: border-box;
+  }
+
+  h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #4CAF50;
+    font-size: 24px;
+  }
+
+  /* Estilo para o input de busca */
+  input[type="text"] {
+    padding: 10px;
+    font-size: 16px;
+    width: 300px;
+    max-width: 100%;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    margin-right: 10px;
+    transition: border 0.3s;
+  }
+
+  input[type="text"]:focus {
+    border-color: #4CAF50;
+    outline: none;
+  }
+
+  /* Estilo para os botões */
+  button {
+    padding: 10px 20px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #4CAF50;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 10px;
+  }
+
+  button:hover {
+    background-color: #45a049;
+  }
+
+  /* Estilos de loading */
+  #loading {
+    display: none;
+    font-size: 18px;
+    font-weight: bold;
+    color: #4CAF50;
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  /* Estilo para os resultados */
+ #resultado {
+      max-height: 300px; /* Altura máxima para o conteúdo */
+      overflow-y: auto;  /* Adicionar rolagem vertical */
+      border: 1px solid #ccc;
+      margin-top: 10px;
+      padding: 10px;
+    }
+
+  #resultado .registro {
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  #resultado .registro:hover {
+    background-color: #f0f0f0;
+  }
+
+  /* Estilos do Modal */
+  #modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+ #modal-content {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      width: 80%;
+      max-height: 80%; /* Limitar altura do modal */
+      overflow-y: auto; /* Adicionar rolagem vertical no modal */
+    }
+
+    #modal-detalhes th,
+    #modal-detalhes td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+  #modal-content p {
+    margin: 10px 0;
+  }
+
+ /* Botão de fechar no modal */
+    #modal-close {
+      display: block;
+      margin-bottom: 10px;
+      cursor: pointer;
+      color: red;
+    }
+
+  #modal-close:hover {
+    background-color: #e53935;
+  }
+
+  /* Estilo para a tabela no modal */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+
+  table, th, td {
+    border: 1px solid #ddd;
+  }
+
+  th, td {
+    padding: 10px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #4CAF50;
+    color: white;
+  }
+
+  td {
+    background-color: #f9f9f9;
+  }
+
+  td:hover {
+    background-color: #f1f1f1;
+  }
+
+  /* Estilo para o botão "Buscar outros alunos" */
+  #refreshButton {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 15px 30px;
+    background-color: #2196F3;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    transition: background-color 0.3s;
+  }
+
+  #refreshButton:hover {
+    background-color: #1976D2;
+  }
+</style>
+
+<style>
+  /* Estilos gerais */
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    box-sizing: border-box;
+  }
+
+  h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #4CAF50;
+    font-size: 24px;
+  }
+
+  /* Estilo para o input de busca */
+  input[type="text"] {
+    padding: 10px;
+    font-size: 16px;
+    width: 300px;
+    max-width: 100%;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    margin-right: 10px;
+    transition: border 0.3s;
+  }
+
+  input[type="text"]:focus {
+    border-color: #4CAF50;
+    outline: none;
+  }
+
+  /* Estilo para os botões */
+  button {
+    padding: 10px 20px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #4CAF50;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 10px;
+  }
+
+  button:hover {
+    background-color: #45a049;
+  }
+
+  /* Estilos de loading */
+  #loading {
+    display: none;
+    font-size: 18px;
+    font-weight: bold;
+    color: #4CAF50;
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  /* Estilo para os resultados */
+  #resultado {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #fff;
+    border-radius: 8px;
+    border: 2px solid #ddd;
+    max-width: 600px;
+    width: 100%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-size: 16px;
+    color: #333;
+  }
+
+  #resultado .registro {
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  #resultado .registro:hover {
+    background-color: #f0f0f0;
+  }
+
+  /* Estilos do Modal */
+  #modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+  }
+
+  #modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  #modal-content p {
+    margin: 10px 0;
+  }
+
+  #modal-close {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  #modal-close:hover {
+    background-color: #e53935;
+  }
+
+  /* Estilo para a tabela no modal */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+
+  table, th, td {
+    border: 1px solid #ddd;
+  }
+
+  th, td {
+    padding: 10px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #4CAF50;
+    color: white;
+  }
+
+  td {
+    background-color: #f9f9f9;
+  }
+
+  td:hover {
+    background-color: #f1f1f1;
+  }
+
+  /* Estilo para o botão "Buscar outros alunos" */
+  #refreshButton {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 15px 30px;
+    background-color: #2196F3;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    transition: background-color 0.3s;
+  }
+
+  #refreshButton:hover {
+    background-color: #1976D2;
+  }
+</style>
+
+<body>
+  <h2>Busca de Alunos</h2>
+
+  <div>
+    <select id="filtroBusca">
+      <option value="nome">Nome</option>
+      <option value="telefone">Telefone</option>
+    </select>
+    <input id="valorBusca" type="text" placeholder="Digite para buscar..." />
+    <button onclick="buscarDados()">Buscar</button>
+  </div>
+
+  <div id="loading">Carregando...</div>
+  <div id="resultado"></div>
+
+  <!-- Modal para detalhes -->
+  <div id="modal">
+    <div id="modal-content">
+      <span id="modal-close" onclick="fecharModal()">Fechar</span>
+      <p>Detalhes do aluno selecionado:</p>
+      <table id="modal-detalhes">
+        <!-- Detalhes do aluno serão carregados aqui -->
+      </table>
+    </div>
+  </div>
+
+  <!-- Botão de refresh -->
+  <button id="refreshButton" onclick="refreshTela()">Buscar outros alunos</button>
+
+  <script>
+    function buscarDados() {
+      const filtro = document.getElementById("filtroBusca").value;
+      const valorBusca = document.getElementById("valorBusca").value.trim();
+
+      document.getElementById("loading").style.display = "block";
+      document.getElementById("resultado").innerHTML = "";
+
+      if (!valorBusca) {
+        alert("Por favor, insira um valor para buscar.");
+        document.getElementById("loading").style.display = "none";
+        return;
+      }
+
+      google.script.run
+        .withSuccessHandler((resultados) => {
+          document.getElementById("loading").style.display = "none";
+
+          if (!resultados.length) {
+            document.getElementById("resultado").innerHTML = "Nenhum resultado encontrado.";
+            return;
+          }
+
+          resultados.forEach((registro) => {
+            const div = document.createElement("div");
+            div.className = "registro";
+            div.innerHTML = `<strong>${registro.nome}</strong> - ${registro.telefone} - ${registro.cidade}`;
+            div.onclick = () => abrirDetalhes(registro.telefone);  // Passar telefone para buscar detalhes
+            document.getElementById("resultado").appendChild(div);
+          });
+        })
+        .withFailureHandler((error) => {
+          alert("Erro ao buscar dados: " + error.message);
+          document.getElementById("loading").style.display = "none";
+        })
+        .buscarDadosAvancados(filtro, valorBusca);
+    }
+
+    function abrirDetalhes(telefone) {
+  document.getElementById("loading").style.display = "block";
+  google.script.run
+    .withSuccessHandler((dadosAluno) => {
+      document.getElementById("loading").style.display = "none";
+      document.getElementById("modal").style.display = "flex";
+
+    const detalhesTabela = document.getElementById("modal-detalhes");
+detalhesTabela.innerHTML = `
+  <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+    <tr><th style="text-align: left;">Planilha inicial</th><td>${dadosAluno.baseInicial}</td></tr>
+    <tr><th style="text-align: left;">Unidade</th><td>${dadosAluno.unidade}</td></tr>
+    <tr><th style="text-align: left;">Turma</th><td>${dadosAluno.turma}</td></tr>
+    <tr><th style="text-align: left;">Nome</th><td>${dadosAluno.nome}</td></tr>
+    <tr><th style="text-align: left;">Telefone</th><td>${dadosAluno.telefone}</td></tr>
+    <tr><th style="text-align: left;">E-mail</th><td>${dadosAluno.email}</td></tr>
+    <tr><th style="text-align: left;">Cidade</th><td>${dadosAluno.cidade}</td></tr>
+    <tr><th style="text-align: left;">Contato iniciado</th><td>${dadosAluno.contatoInicial}</td></tr>
+    <tr><th style="text-align: left;">Status do contato</th><td>${dadosAluno.statusContato}</td></tr>
+    <tr><th style="text-align: left;">Analista responsável</th><td>${dadosAluno.responsavel}</td></tr>
+    <tr><th style="text-align: left;">Retorno do aluno</th><td>${dadosAluno.retornoAluno}</td></tr>
+    <tr><th style="text-align: left;">Preparação para 2025</th><td>${dadosAluno.preparacao2025}</td></tr>
+    <tr><th style="text-align: left;">Campo de descrição</th><td>${dadosAluno.textolivre}</td></tr>
+  </table>
+
+  <fieldset style="margin-top: 20px; border: 1px solid #ccc; padding: 10px;">
+    <legend style="font-weight: bold;">Campo de edição</legend>
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <div style="display: flex; flex-direction: column;">
+        <label for="colunaM" style="font-weight: bold;">Coluna M</label>
+        <input id="colunaM" type="text" value="${dadosAluno.colunaM || ''}" style="padding: 5px; border: 1px solid #ccc; border-radius: 4px;" />
+      </div>
+      <div style="display: flex; flex-direction: column;">
+        <label for="colunaAB" style="font-weight: bold;">Coluna AB</label>
+        <input id="colunaAB" type="text" value="${dadosAluno.colunaAB || ''}" style="padding: 5px; border: 1px solid #ccc; border-radius: 4px;" />
+      </div>
+      <button onclick="salvarAlteracoes('${dadosAluno.telefone}')" style="padding: 10px; background-color: #007BFF; color: white; border: none; border-radius: 4px; cursor: pointer;">
+        Salvar Alterações
+      </button>
+    </div>
+  </fieldset>
+`;
+
+    })
+    .withFailureHandler((error) => {
+      alert("Erro ao carregar detalhes: " + error.message);
+      document.getElementById("loading").style.display = "none";
+    })
+    .buscarDetalhes(telefone);
+}
+
+function salvarAlteracoes(telefone) {
+  const colunaM = document.getElementById("colunaM").value.trim();
+  const colunaAB = document.getElementById("colunaAB").value.trim();
+
+  google.script.run
+    .withSuccessHandler(() => {
+      alert("Alterações salvas com sucesso!");
+      fecharModal();
+    })
+    .withFailureHandler((error) => {
+      alert("Erro ao salvar alterações: " + error.message);
+    })
+    .atualizarColunas(telefone, colunaM, colunaAB);
+}
+
+
+    function fecharModal() {
+      document.getElementById("modal").style.display = "none";
+    }
+
+    function refreshTela() {
+      location.reload();
+    }
+  </script>
+</body>
+
+
+</html>
