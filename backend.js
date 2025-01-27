@@ -1,5 +1,5 @@
 function buscarDadosAvancados(filtro, valorBusca) {
-  var ss = SpreadsheetApp.openById("Id da planilha");
+  var ss = SpreadsheetApp.openById("1ssFtFcTFh5Pcn-1UKdFm3E9kUIfRZStApR7fCAuukmc");
   var sheet = ss.getSheetByName("Base principal");
 
   if (!sheet) {
@@ -47,7 +47,7 @@ function buscarDadosAvancados(filtro, valorBusca) {
 }
 
 function buscarDetalhes(tel) {
-  var ss = SpreadsheetApp.openById("Id da planilha");
+  var ss = SpreadsheetApp.openById("1ssFtFcTFh5Pcn-1UKdFm3E9kUIfRZStApR7fCAuukmc");
   var sheet = ss.getSheetByName("Base principal");
 
   if (!sheet) {
@@ -82,40 +82,48 @@ function buscarDetalhes(tel) {
     textoLivre: detalhe[27] || "Sem texto livre" // Coluna AB
   };
 }
+function buscarOpcoesColunaM() {
+  const ss = SpreadsheetApp.openById("1ssFtFcTFh5Pcn-1UKdFm3E9kUIfRZStApR7fCAuukmc");
+  const sheet = ss.getSheetByName("Base principal");
+  const dados = sheet.getDataRange().getValues();
+
+  const responsaveis = [...new Set(dados.slice(1).map(linha => linha[12]).filter(Boolean))];
+  return responsaveis;
+}
 
 
 function salvarAlteracoes(telefone, dadosEdicao) {
-  var ss = SpreadsheetApp.openById("Id da planilha");
-  var sheet = ss.getSheetByName("Base principal");
-
-  if (!sheet) {
-    throw new Error('Planilha "Base principal" não encontrada.');
-  }
-
-  var dados = sheet.getDataRange().getValues();
-  var telefoneIndex = 3; // Coluna do telefone (D)
-
-  // Encontra o índice da linha do telefone
-  var indice = dados.findIndex(linha => String(linha[telefoneIndex]) === String(telefone));
-
+  const ss = SpreadsheetApp.openById("1ssFtFcTFh5Pcn-1UKdFm3E9kUIfRZStApR7fCAuukmc");
+  const sheet = ss.getSheetByName("Base principal");
+  const dados = sheet.getDataRange().getValues();
+  const telefoneIndex = 3; // Coluna do telefone (D)
+  
+  const indice = dados.findIndex(linha => String(linha[telefoneIndex]) === String(telefone));
   if (indice === -1) {
     throw new Error("Registro não encontrado.");
   }
 
-  // Atualiza os campos editáveis
-  if (dadosEdicao.responsavel !== undefined) {
-    sheet.getRange(indice + 1, 13).setValue(dadosEdicao.responsavel); // Coluna M
+  if (dadosEdicao.colunaM) {
+    sheet.getRange(indice + 1, 13).setValue(dadosEdicao.colunaM); // Coluna M
   }
-  if (dadosEdicao.textoLivre !== undefined) {
-    sheet.getRange(indice + 1, 28).setValue(dadosEdicao.textoLivre); // Coluna AB
+  if (dadosEdicao.colunaAB) {
+    sheet.getRange(indice + 1, 28).setValue(dadosEdicao.colunaAB); // Coluna AB
   }
-
-  return { mensagem: "Alterações salvas com sucesso!" };
+  if (dadosEdicao.data1) {
+    sheet.getRange(indice + 1, 10).setValue(dadosEdicao.data1); // Coluna J
+  }
+  if (dadosEdicao.data2) {
+    sheet.getRange(indice + 1, 11).setValue(dadosEdicao.data2); // Coluna K
+  }
+  if (dadosEdicao.data3) {
+    sheet.getRange(indice + 1, 12).setValue(dadosEdicao.data3); // Coluna L
+  }
 }
 
 
+
 function atualizarColunas(telefone, colunaM, colunaAB) {
-  const ss = SpreadsheetApp.openById("Id da planilha");
+  const ss = SpreadsheetApp.openById("1ssFtFcTFh5Pcn-1UKdFm3E9kUIfRZStApR7fCAuukmc");
   const sheet = ss.getSheetByName("Base principal");
   const dados = sheet.getDataRange().getValues();
   const telefoneIndex = 3; // Coluna do telefone (D)
@@ -133,5 +141,4 @@ function atualizarColunas(telefone, colunaM, colunaAB) {
 
 
 
-
-// Lembrando que os indices, são de acordo com a planilha, dependo da necessidade tem que mudar essas posições. O código acima, ele busca informações em uma base de dados muito grande e retornar os usuários próximos. Assim algumas informações podem ser editadas.
+//buscarDetalhes(11973270278)

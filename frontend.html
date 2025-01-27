@@ -630,25 +630,64 @@ detalhesTabela.innerHTML = `
     <tr><th style="text-align: left;">Analista responsável</th><td>${dadosAluno.responsavel}</td></tr>
     <tr><th style="text-align: left;">Retorno do aluno</th><td>${dadosAluno.retornoAluno}</td></tr>
     <tr><th style="text-align: left;">Preparação para 2025</th><td>${dadosAluno.preparacao2025}</td></tr>
-    <tr><th style="text-align: left;">Campo de descrição</th><td>${dadosAluno.textolivre}</td></tr>
+    <tr><th style="text-align: left;">Campo de descrição</th><td>${dadosAluno.textoLivre}</td></tr>
   </table>
-
-  <fieldset style="margin-top: 20px; border: 1px solid #ccc; padding: 10px;">
-    <legend style="font-weight: bold;">Campo de edição</legend>
-    <div style="display: flex; flex-direction: column; gap: 10px;">
-      <div style="display: flex; flex-direction: column;">
-        <label for="colunaM" style="font-weight: bold;">Coluna M</label>
-        <input id="colunaM" type="text" value="${dadosAluno.colunaM || ''}" style="padding: 5px; border: 1px solid #ccc; border-radius: 4px;" />
-      </div>
-      <div style="display: flex; flex-direction: column;">
-        <label for="colunaAB" style="font-weight: bold;">Coluna AB</label>
-        <input id="colunaAB" type="text" value="${dadosAluno.colunaAB || ''}" style="padding: 5px; border: 1px solid #ccc; border-radius: 4px;" />
-      </div>
-      <button onclick="salvarAlteracoes('${dadosAluno.telefone}')" style="padding: 10px; background-color: #007BFF; color: white; border: none; border-radius: 4px; cursor: pointer;">
-        Salvar Alterações
-      </button>
+<fieldset style="margin-top: 20px; border: 1px solid #ccc; padding: 10px;">
+  <legend style="font-weight: bold;">Campo de edição</legend>
+  <div style="display: flex; flex-direction: column; gap: 10px;">
+    <!-- Campo para a Coluna M com opções -->
+    <div style="display: flex; flex-direction: column;">
+      <label for="colunaM" style="font-weight: bold;">Coluna M</label>
+      <select id="colunaM" style="padding: 5px; border: 1px solid #ccc; border-radius: 4px;">
+        <option value="">Selecione um responsável</option>
+        <option value="Paula">Paula</option>
+        <option value="Mileny">Mileny</option>
+        <option value="Roberta">Roberta</option>
+        <option value="Beatriz">Beatriz</option>
+        <option value="Brenda">Brenda</option>
+        <option value="Aline">Aline</option>
+        <option value="Vanessa">Vanessa</option>
+        <option value="Camila">Camila</option>
+        <option value="Gabrielli">Gabrielli</option>
+        <option value="Natasha">Natasha</option>
+        <option value="Flávia">Flávia</option>
+        <option value="Luciane">Luciane</option>
+        <option value="Adonai">Adonai</option>
+        <option value="Yuri">Yuri</option>
+        <option value="Janine">Janine</option>
+        <option value="Paloma">Paloma</option>
+        <option value="Claudia">Claudia</option>
+        <option value="Vytoria">Vytoria</option>
+        <option value="Raquel">Raquel</option>
+        <option value="William">William</option>
+      </select>
     </div>
-  </fieldset>
+    <!-- Campo para a Coluna AB -->
+    <div style="display: flex; flex-direction: column;">
+      <label for="colunaAB" style="font-weight: bold;">Coluna AB</label>
+      <input id="colunaAB" type="text" value="${dadosAluno.colunaAB || ''}" style="padding: 5px; border: 1px solid #ccc; border-radius: 4px;" />
+    </div>
+    <!-- Campos adicionais para data -->
+    <div style="display: flex; flex-direction: column;">
+      <label for="data1" style="font-weight: bold;">Data 1 (Coluna J)</label>
+      <input id="data1" type="date" style="padding: 5px; border: 1px solid #ccc; border-radius: 4px;" />
+    </div>
+    <div style="display: flex; flex-direction: column;">
+      <label for="data2" style="font-weight: bold;">Data 2 (Coluna K)</label>
+      <input id="data2" type="date" style="padding: 5px; border: 1px solid #ccc; border-radius: 4px;" />
+    </div>
+    <div style="display: flex; flex-direction: column;">
+      <label for="data3" style="font-weight: bold;">Data 3 (Coluna L)</label>
+      <input id="data3" type="date" style="padding: 5px; border: 1px solid #ccc; border-radius: 4px;" />
+    </div>
+    <!-- Botão de Salvar -->
+    <button onclick="salvarAlteracoes('${dadosAluno.telefone}')" style="padding: 10px; background-color: #007BFF; color: white; border: none; border-radius: 4px; cursor: pointer;">
+      Salvar Alterações
+    </button>
+  </div>
+</fieldset>
+
+
 `;
 
     })
@@ -660,19 +699,33 @@ detalhesTabela.innerHTML = `
 }
 
 function salvarAlteracoes(telefone) {
-  const colunaM = document.getElementById("colunaM").value.trim();
-  const colunaAB = document.getElementById("colunaAB").value.trim();
+  const colunaM = document.getElementById("colunaM").value;
+  const colunaAB = document.getElementById("colunaAB").value;
+  const data1 = document.getElementById("data1").value;
+  const data2 = document.getElementById("data2").value;
+  const data3 = document.getElementById("data3").value;
+
+  if (!data1 || !data2 || !data3) {
+    alert("Por favor, insira datas válidas.");
+    return;
+  }
 
   google.script.run
-    .withSuccessHandler(() => {
-      alert("Alterações salvas com sucesso!");
-      fecharModal();
-    })
-    .withFailureHandler((error) => {
-      alert("Erro ao salvar alterações: " + error.message);
-    })
-    .atualizarColunas(telefone, colunaM, colunaAB);
+    .withSuccessHandler(() => alert("Alterações salvas com sucesso!"))
+    .salvarAlteracoes(telefone, { colunaM, colunaAB, data1, data2, data3 });
 }
+
+function carregarOpcoesColunaM() {
+  google.script.run
+    .withSuccessHandler(function (opcoes) {
+      const select = document.getElementById("colunaM");
+      select.innerHTML = opcoes
+        .map(opcao => `<option value="${opcao}">${opcao}</option>`)
+        .join('');
+    })
+    .buscarOpcoesColunaM();
+}
+carregarOpcoesColunaM();
 
 
     function fecharModal() {
